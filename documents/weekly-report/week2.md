@@ -16,7 +16,7 @@ The script that convert the dataset had provided by the Apollo, but they don’t
 
 ## Next week task
 
-- **Urgent:**
-    - Convert the nuscenses dataset to .record file
-- **Regular**
-    - Sent email to Dr.Justin, to discuss scope of the project. Should draft the project proposal and project Gantt chart beforehand.
+### Urgent
+- Convert the nuscenses dataset to .record file
+### Regular
+- Sent email to Dr.Justin, to discuss scope of the project. Should draft the project proposal and project Gantt chart beforehand.
