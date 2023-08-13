@@ -22,8 +22,6 @@ import yaml
 
 from itertools import chain
 from pathlib import Path
-
-# from nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
 from nuscenes_lib import NuScenesSchema, NuScenesHelper, NuScenes
 
 
