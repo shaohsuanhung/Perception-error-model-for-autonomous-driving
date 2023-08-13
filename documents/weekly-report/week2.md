@@ -7,16 +7,17 @@
 ## Weekly outcome
 
 - Study the cyber_rt protocol and know the whole message passing system to covert the dataset.
-- Writing python scripts that convert the nuscenes dataset to .record file.
+- The pratice scripts of the nuscenes dataset is under ```./scripts/nuscenes_dataset_pratice/```.
+- Writing python scripts that convert the nuscenes dataset to .record file, placed at ```./scripts/nuscenes_converter```.
 
 ## Challenging task of the week:
 
 - **How to convert radar data to Apollo**.  
-The script that convert the dataset had provided by the Apollo, but they don’t support the radar dataset convertion. So I had to modify the scripts by myself. But first I have to look into several API such as nuscenes dataset Dev-kit API, CyberRT API.
+Find scripts that convert the dataset had provided by the Apollo, but they don’t support the radar dataset convertion. So I had to modify the scripts by myself. Before starting programming, I need to look into several API such as nuscenes dataset Dev-kit API, Cyber RT API, and messages that published on the runtime framework.
 
 ## Next week task
 
 ### Urgent
-- Convert the nuscenses dataset to .record file
-### Regular
+- Convert the nuscenses dataset to .record file.
+### Normal
 - Sent email to Dr.Justin, to discuss scope of the project. Should draft the project proposal and project Gantt chart beforehand.
