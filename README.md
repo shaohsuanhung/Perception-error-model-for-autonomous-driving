@@ -1,4 +1,4 @@
-# self-driving-internship-project
+# Self Driving Internship   
 ## Introduction
 The 14 weeks full-time research internship. The main goal of the project is to discuss different combination of sensors (camera, radar, LiDAR, camera+radar, camera+radar+LiDar,etc.) under different environment conditions (rain,sunny, dim-light, overexposure light,etc.). 
 

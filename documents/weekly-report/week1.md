@@ -1,9 +1,6 @@
 ## Week1 (July 24 ~ July 30)
-
-**Summary of the week:** Planning + Environment setup + Learn background knowledge and software tool.
-
 ## Progress
-
+Planning + Environment setup + Learn background knowledge and software tool.
 ### Software Environment setting
 - Install dual boot operating system (Ubuntu 20.04 + Windows10)
 - Apollo 8.0 download and docker setup
@@ -29,6 +26,6 @@
 ### Urgent  
 - Internship research proposal (including problem statement, goal)
 - Set up github page, write research description, deliverable on main page
- - Gantt chart
+- Gantt chart of the project.
 ### Normal  
 - Convert nuscenes dataset to apollo system

@@ -2,10 +2,9 @@
 
 **Summary of the week:**  
 1. Learning API of Cyber RT and nuScenes dataset. 
-2. Converting the nuscenes dataset to .record files.
+2. Work on python that converting the nuscenes dataset to .record files.
 
-## Weekly outcome
-
+## Progress
 - Study the cyber_rt protocol and know the whole message passing system to covert the dataset.
 - The pratice scripts of the nuscenes dataset is under ```./scripts/nuscenes_dataset_pratice/```.
 - Writing python scripts that convert the nuscenes dataset to .record file, placed at ```./scripts/nuscenes_converter```.
@@ -19,5 +18,8 @@ Find scripts that convert the dataset had provided by the Apollo, but they donâ€
 
 ### Urgent
 - Convert the nuscenses dataset to .record file.
+- (From week 1) Internship research proposal (including problem statement, goal)
+- (From week 1) Set up github page, write research description, deliverable on main page.
+- (From week 1) Gantt chart of the project.
 ### Normal
-- Sent email to Dr.Justin, to discuss scope of the project. Should draft the project proposal and project Gantt chart beforehand.
+- Run the Apollo perception module, and see how the system perceived the nuscenes dataset.
