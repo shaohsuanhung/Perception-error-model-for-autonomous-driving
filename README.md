@@ -1,6 +1,6 @@
 # Self Driving Internship   
 ## Introduction
-The 14 weeks full-time research internship. The main goal of the project is to discuss different combination of sensors (camera, radar, LiDAR, camera+radar, camera+radar+LiDar, etc.) under different environment conditions (rain,sunny, dim-light, overexposure light, etc.). 
+The 14 weeks full-time research internship. The main goal of the project is to discuss different combination of sensors (camera, radar, LiDAR, camera+radar, camera+radar+LiDAR, etc.) under different environment conditions (rain,sunny, dim-light, overexposure light, etc.). 
 
 ## Project
 ### Problem statement
@@ -14,3 +14,6 @@ Coming up with a self-designed perception model such as HMM, then compare and an
 
 ### Schedule
 ![](documents/images/Gantt%20Chart.PNG)
+
+### Progress 
+Please refer to the following directory: [documents/weekly-report](https://github.com/HungFrancis/self-driving-internship-project/tree/main/documents/weekly-report).
