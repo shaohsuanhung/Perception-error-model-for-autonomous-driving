@@ -10,7 +10,7 @@ The designed HMM-based model using multi-modal sensors (camera, radar, LiDAR, ca
 2. Converting nuScenes dataset (radar data especially) to the .record file (see ```./scripts/nuscenes_converter```) that can play on the Apolloauto system. Using the perception modules in the Apollo system to investigate perception outcome that perceived by Apollo, and compute the metrics (e.g., IOU) with the ground truth.
 
 ### Project phase 2
-Coming up with a self-designed perception model such as HMM, then compare and analyses the perception module of the Apollo.s
+Coming up with a self-designed perception model such as HMM, then compare and analyses the perception module of the Apollo.
 
 ### Schedule
 ![](documents/images/Gantt%20Chart.PNG)
