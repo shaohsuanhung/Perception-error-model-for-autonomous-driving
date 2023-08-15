@@ -9,3 +9,6 @@ The 14 weeks full-time research internship. The main goal of the project is to d
 
 ### Phase 2
 come up with a self-designed perception model such as HMM, then compare and analyses the perception module of the Apollo.s
+
+### Schedule
+![](documents/images/Gantt%20Chart.PNG)
