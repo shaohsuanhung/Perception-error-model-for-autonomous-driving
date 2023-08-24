@@ -1,4 +1,4 @@
-## Week1 (July 24 ~ July 30)
+## Week 1 (July 24 ~ July 30)
 ## Progress
 Planning + Environment setup + Learn background knowledge and software tool.
 ### Software Environment setting
