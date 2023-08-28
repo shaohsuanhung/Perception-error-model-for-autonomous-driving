@@ -26,6 +26,7 @@ from protoLib.conti_radar_pb2 import ContiRadar, ContiRadarObs
 from protoLib.perception_obstacle_pb2 import PerceptionObstacles, PerceptionObstacle
 import math
 from nuscenes.nuscenes import NuScenes as Nuscenes_dataset
+from protoLib.imu_pb2 import Imu
 #
 DATAVERSION = 'v1.0-mini'
 DATAROOT = '/home/francis/Desktop/internship/nuScenes_dataset'
@@ -39,6 +40,8 @@ pedestrian = ['human.pedestrian.adult', 'human.pedestrian.child', 'human.pedestr
 vehicle = ['vehicle.bus.bendy', 'vehicle.bus.rigid', 'vehicle.car', 'vehicle.construction',
                    'vehicle.emergency.ambulance', 'vehicle.emergency.police', 'vehicle.motorcycle',
                    'vehicle.trailer', 'vehicle.truck'] 
+
+moveable_obj = ['movable_object.barrier','movable_object.debris','movable_object.pushable_pul','movable_object.trafficcone']
 #
 
 # Need to convert to apollo coordinate system, for nuscenes is 90 degrees
@@ -47,7 +50,7 @@ LIDAR_TRANSFORM = np.array([[ 0.0020333, 0.9997041, 0.0242417, 0.9437130],
                             [-0.0058997,-0.0242294, 0.9996890, 1.8402300],
                             [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
 
-def dataset_to_record(nuscenes, record_root_path):
+def dataset_to_record(nuscenes, record_root_path,idx):
   """Construct record message and save it as record
 
   Args:
@@ -58,11 +61,12 @@ def dataset_to_record(nuscenes, record_root_path):
   pc_builder = PointCloudBuilder(dim=5)
   pc_builder_extra = PointCloudBuilder_extra(dim=5)
   localization_builder = LocalizationBuilder()
-  transform_builder = TransformBuilder()
-
+  transform_builder = TransformBuilder() 
   record_file_name = "{}.record".format(nuscenes.scene_token)
   record_file_path = os.path.join(record_root_path, record_file_name)
-
+  # First sample token
+  sample = nusc.get('sample',nusc.scene[idx]['first_sample_token'])
+  #
   with Record(record_file_path, mode='w') as record:
     j = 0
     for c, f, ego_pose, calibrated_sensor, t in nuscenes:
@@ -72,14 +76,29 @@ def dataset_to_record(nuscenes, record_root_path):
       if c.startswith('CAM'):
         pb_msg = image_builder.build(f, 'camera', 'rgb8', t/1e6)
         channel_name = "/apollo/sensor/camera/{}/image".format(c)
+
       elif c.startswith('LIDAR'):
         pb_msg = pc_builder.build_nuscenes(f, 'velodyne', t/1e6, LIDAR_TRANSFORM)
-        channel_name = "/apollo/sensor/{}/compensator/PointCloud2".format(c)
-    
-      elif c.startswith('RADAR'):
+        channel_name = "/apollo/sensor/lidar128/compensator/PointCloud2"
+        # channel_name = "/apollo/sensor/lidar32/compensator/PointCloud2"
+
+      elif c.startswith('RADAR_FRONT'):
         # print('Processing Radar')
         pb_msg = pc_builder_extra.build_nuscenes_radar(f,'radar',j,t/1e6)
-        channel_name = "/apollo/sensor/{}".format(c)
+        if c == 'RADAR_FRONT':
+           channel_name = "/apollo/sensor/radar/front"
+        elif c == 'RADAR_FRONT_LEFT':
+           channel_name = "/apollo/sensor/radar/front_left"
+        elif c == 'RADAR_FRONT_RIGHT':
+           channel_name = "/apollo/sensor/radar/front_right"
+
+      elif c.startswith('RADAR_BACK'):
+        pb_msg = pc_builder_extra.build_nuscenes_radar(f,'radar',j,t/1e6)
+        # channel_name = "/apollo/sensor/radar/rear"
+        if c == 'RADAR_BACK_LEFT':
+          channel_name = "/apollo/sensor/radar/rear_left"
+        elif c == 'RADAR_BACK_RIGHT':
+           channel_name = "/apollo/sensor/radar/rear_right"
 
       if pb_msg:
         record.write(channel_name, pb_msg, t*1000)
@@ -100,14 +119,37 @@ def dataset_to_record(nuscenes, record_root_path):
         ego_pose['translation'], ego_pose['rotation'], ego_pose_t/1e6)
       if pb_msg:
         record.write(TF_TOPIC, pb_msg, ego_pose_t*1000)
-      #
-      ##################### Ground Truth #######################
-      samples = nuscenes.nuscenes_helper.get_sample_by_scene(nuscenes.scene_token)
-      for sample in samples:
-        pb_msg = pc_builder_extra.build_nuscenes_gt(nusc.get('sample',sample['token']),'gt',j,t/1e6)
-        if pb_msg:
-          record.write(GT,pb_msg,t*1000)
       
+      ##################### Ground Truth #######################
+      # samples = nuscenes.nuscenes_helper.get_sample_by_scene(nuscenes.scene_token)
+      # for sample in samples:
+      #   pb_msg = pc_builder_extra.build_nuscenes_gt(nusc.get('sample',sample['token']),'gt',j,t/1e6)
+      #   if pb_msg:
+      #     record.write(GT,pb_msg,t*1000)
+      # first_sample = nusc.get('sample',nuscenes.scene_token['first_sample_token'])
+      # pb_msg = pc_builder_extra.build_nuscenes_gt(nusc.get('sample',token),'gt',j,t/1e6)
+      # print(sample)
+      
+      # Annotation is two herz, should send same msg twice. 
+      # try:
+      #   gt_timstamp = sample['timestamp']
+      #   pb_msg = pc_builder_extra.build_nuscenes_gt(sample,'gt',gt_timstamp/1e6)
+      #   sample = nusc.get('sample',sample['next'])
+      #   if pb_msg:
+      #     record.write(GT,pb_msg,gt_timstamp*1000)
+      # except:
+      #    pass
+      # print("t:{},ego_pose_t:{},GT_time:{}".format(t,ego_pose_t,gt_timstamp))
+      if(ego_pose_t==sample['timestamp']):
+         gt_timestamp = sample['timestamp']
+         pb_msg = pc_builder_extra.build_nuscenes_gt(sample,'gt',gt_timestamp/1e6)
+         try:
+          sample = nusc.get('sample',sample['next'])
+          if pb_msg:
+              record.write(GT,pb_msg,gt_timestamp*1000)
+         except:
+            pass
+        
       j+=1
 
 def convert_dataset(dataset_path, record_path):
@@ -119,13 +161,13 @@ def convert_dataset(dataset_path, record_path):
   """
   nuscenes_schema = NuScenesSchema(dataroot=dataset_path)
   n_helper = NuScenesHelper(nuscenes_schema)
-  # i = 0
+  i = 0
   for scene_token in nuscenes_schema.scene.keys():
     # if(i<2): # For testing
     print("Start to convert scene: {}, Pls wait!".format(scene_token))
     nuscenes = NuScenes(n_helper, scene_token)
-    dataset_to_record(nuscenes, record_path)
-    # i+=1
+    dataset_to_record(nuscenes, record_path,i)
+    i+=1
     # else:
       #  break
   print("Success! Records saved in '{}'".format(record_path))
@@ -235,7 +277,7 @@ class PointCloudBuilder_extra(Builder_extra):
     return msg
   def build_nuscenes_gt(self,sample,frame_id, sequ_num, t= None):
     msg= PerceptionObstacles()
-    # msg.header.timestamp_sec = sample['timestamp']
+    msg.header.timestamp_sec = sample['timestamp']
     obstacleList = list()
     instanceDict = dict()
     IDcount = 0
@@ -245,6 +287,7 @@ class PointCloudBuilder_extra(Builder_extra):
         sampleAnn = nusc.get('sample_annotation', ann)
         #print(sampleAnn)
         category = 0
+        # What else ground truth to include? 
         if sampleAnn['category_name'] in pedestrian:
             category = 3
         if sampleAnn['category_name'] in vehicle :
@@ -258,10 +301,12 @@ class PointCloudBuilder_extra(Builder_extra):
             newObs.id = instanceDict[sampleAnn["instance_token"]]
             #print(sampleAnn["instance_token"], self.instanceDict[sampleAnn["instance_token"]])
             x, y, z = sampleAnn["translation"]
-            newObs.position.x,newObs.position.y, newObs.position.z = y,-x,z
+            # newObs.position.x,newObs.position.y, newObs.position.z = y,-x,z
+            newObs.position.x,newObs.position.y, newObs.position.z = x, y,z
             X, Y, Z = quaternion_to_euler(sampleAnn["rotation"])
             newObs.tracking_time = float(sampleAnn["visibility_token"])
-            newObs.theta =math.radians(-X+90)
+            # newObs.theta =math.radians(-X+90)
+            newObs.theta = math.radians(-X+180)
             x, y, z = sampleAnn["size"]
             newObs.length =y
             newObs.width =z
@@ -275,7 +320,17 @@ class PointCloudBuilder_extra(Builder_extra):
     msg.perception_obstacle.extend(obstacleList)
     return msg
 
+  def makeIMU(self,sampleData, j):
+        msg = Imu()
+        msg.header.timestamp_sec = sampleData['timestamp']
+        msg.measurement_time = sampleData['timestamp']
+        msg.measurement_span = 0.010000
 
+        msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z = [
+            -0.000003895, 0.000007844, 9.810022354]
+        msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z = [
+            -0.000000140, -0.000000205, 0.000000000]
+        return msg
 
 def quaternion_to_euler(quat):
         x, y, z, w = quat
