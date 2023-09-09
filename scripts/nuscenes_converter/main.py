@@ -28,7 +28,12 @@ def main(args=sys.argv):
     "-t", "--type", action="store", type=str, required=False,
     default="rcd", choices=['rcd', 'cal', 'pcd'],
     help="Conversion type. rcd:record, cal:calibration, pcd:pointcloud")
-
+  # Customize for dataset preparation. To identify it's ground truth or detection
+  parser.add_argument(
+    "-m", "--mode", action="store", type=str, required=False,
+    default="detection", choices=['gt', 'detection'],
+    help="Type of data, ground truth or perception data")
+  
   args = parser.parse_args(args[1:])
   logging.debug(args)
 
@@ -36,7 +41,7 @@ def main(args=sys.argv):
     if os.path.isdir(args.input):
       if args.output is None:
         args.output = '.'
-      convert_dataset(args.input, args.output)
+      convert_dataset(args.input, args.output,args.mode)
     else:
       logging.error("Pls enter directory! Not '{}'".format(args.input))
   elif args.type == 'cal':

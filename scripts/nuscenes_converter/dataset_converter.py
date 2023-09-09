@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 ###############################################################################
 #  Authors: HungFrancis. All Rights Reserved
+# Command: python3 main.py -i {input directory} -o {output directory}
+# Command case: python3 main.py -i /home/francis/Desktop/internship/nuScenes_dataset -o .
 ###############################################################################
 '''Generate apollo record file by nuscenes raw sensor data.'''
 import os
@@ -37,32 +39,42 @@ nusc = Nuscenes_dataset(version=DATAVERSION, dataroot=DATAROOT, verbose=True)
 pedestrian = ['human.pedestrian.adult', 'human.pedestrian.child', 'human.pedestrian.construction_worker',
                       'human.pedestrian.personal_mobility', 'human.pedestrian.police_officer', 'human.pedestrian.stroller',
                       'human.pedestrian.wheelchair']
-vehicle = ['vehicle.bus.bendy', 'vehicle.bus.rigid', 'vehicle.car', 'vehicle.construction',
+vehicle = ['vehicle.bicycle','','vehicle.bus.bendy', 'vehicle.bus.rigid', 'vehicle.car', 'vehicle.construction',
                    'vehicle.emergency.ambulance', 'vehicle.emergency.police', 'vehicle.motorcycle',
                    'vehicle.trailer', 'vehicle.truck'] 
 
-moveable_obj = ['movable_object.barrier','movable_object.debris','movable_object.pushable_pul','movable_object.trafficcone']
+moveable_obj = ['movable_object.barrier','movable_object.debris','movable_object.pushable_pullable','movable_object.trafficcone']
+static_obj = ['static_object.bicycle_rack']
 #
 
 # Need to convert to apollo coordinate system, for nuscenes is 90 degrees
-LIDAR_TRANSFORM = np.array([[ 0.0020333, 0.9997041, 0.0242417, 0.9437130],
+LIDAR_TRANSFORM_before_rotate = np.array([[ 0.0020333, 0.9997041, 0.0242417, 0.9437130],
                             [-0.9999805, 0.0021757,-0.0058486, 0.0000000],
                             [-0.0058997,-0.0242294, 0.9996890, 1.8402300],
                             [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
-
-def dataset_to_record(nuscenes, record_root_path,idx):
+# Since the original rotation mtx is still 90 deg. compare with the ground truth. Furhter rotate -90 deg. wrt z axis
+ROTATE = np.array([[ 0.0000000, 1.0000000, 0.0000000, 0.0000000],
+                   [-1.0000000, 0.0000000,0.0000000, 0.0000000],
+                   [0.0000000,0.0000000, 1.0000000, 0.0000000],
+                   [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
+LIDAR_TRANSFORM = np.matmul(LIDAR_TRANSFORM_before_rotate,ROTATE)
+def dataset_to_record(nuscenes, record_root_path,idx,mode):
   """Construct record message and save it as record
 
   Args:
       nuscenes (_type_): nuscenes(one scene)
       record_root_path (str): record file saved path
   """
+  # print(LIDAR_TRANSFORM)
   image_builder = ImageBuilder()
   pc_builder = PointCloudBuilder(dim=5)
   pc_builder_extra = PointCloudBuilder_extra(dim=5)
   localization_builder = LocalizationBuilder()
   transform_builder = TransformBuilder() 
-  record_file_name = "{}.record".format(nuscenes.scene_token)
+  if mode == 'gt':
+    record_file_name = "{}_gt.record".format(nuscenes.scene_token)
+  elif mode == 'detection':
+    record_file_name = "{}_detection.record".format(nuscenes.scene_token)
   record_file_path = os.path.join(record_root_path, record_file_name)
   # First sample token
   sample = nusc.get('sample',nusc.scene[idx]['first_sample_token'])
@@ -79,8 +91,9 @@ def dataset_to_record(nuscenes, record_root_path,idx):
 
       elif c.startswith('LIDAR'):
         pb_msg = pc_builder.build_nuscenes(f, 'velodyne', t/1e6, LIDAR_TRANSFORM)
-        channel_name = "/apollo/sensor/lidar128/compensator/PointCloud2"
-        # channel_name = "/apollo/sensor/lidar32/compensator/PointCloud2"
+        # pb_msg = pc_builder.build_nuscenes(f, 'velodyne', t/1e6)
+        # channel_name = "/apollo/sensor/lidar128/compensator/PointCloud2"
+        channel_name = "/apollo/sensor/lidar32/compensator/PointCloud2"
 
       elif c.startswith('RADAR_FRONT'):
         # print('Processing Radar')
@@ -120,39 +133,24 @@ def dataset_to_record(nuscenes, record_root_path,idx):
       if pb_msg:
         record.write(TF_TOPIC, pb_msg, ego_pose_t*1000)
       
-      ##################### Ground Truth #######################
-      # samples = nuscenes.nuscenes_helper.get_sample_by_scene(nuscenes.scene_token)
-      # for sample in samples:
-      #   pb_msg = pc_builder_extra.build_nuscenes_gt(nusc.get('sample',sample['token']),'gt',j,t/1e6)
-      #   if pb_msg:
-      #     record.write(GT,pb_msg,t*1000)
-      # first_sample = nusc.get('sample',nuscenes.scene_token['first_sample_token'])
-      # pb_msg = pc_builder_extra.build_nuscenes_gt(nusc.get('sample',token),'gt',j,t/1e6)
-      # print(sample)
-      
-      # Annotation is two herz, should send same msg twice. 
-      # try:
-      #   gt_timstamp = sample['timestamp']
-      #   pb_msg = pc_builder_extra.build_nuscenes_gt(sample,'gt',gt_timstamp/1e6)
-      #   sample = nusc.get('sample',sample['next'])
-      #   if pb_msg:
-      #     record.write(GT,pb_msg,gt_timstamp*1000)
-      # except:
-      #    pass
+      ############################ Ground Truth ##################################
       # print("t:{},ego_pose_t:{},GT_time:{}".format(t,ego_pose_t,gt_timstamp))
-      if(ego_pose_t==sample['timestamp']):
-         gt_timestamp = sample['timestamp']
-         pb_msg = pc_builder_extra.build_nuscenes_gt(sample,'gt',gt_timestamp/1e6)
-         try:
-          sample = nusc.get('sample',sample['next'])
-          if pb_msg:
-              record.write(GT,pb_msg,gt_timestamp*1000)
-         except:
-            pass
-        
+      # To activate the ground truth, please un-comment the following block
+      ############################################################################
+      if mode == 'gt':
+        if(ego_pose_t==sample['timestamp']):
+          gt_timestamp = sample['timestamp']
+          pb_msg = pc_builder_extra.build_nuscenes_gt(sample,'gt',gt_timestamp/1e6)
+          try:
+            sample = nusc.get('sample',sample['next'])
+            if pb_msg:
+                record.write(GT,pb_msg,gt_timestamp*1000)
+          except:
+              pass
+      ############################################################################  
       j+=1
 
-def convert_dataset(dataset_path, record_path):
+def convert_dataset(dataset_path, record_path,mode):
   """Generate apollo record file by nuscenes dataset
 
   Args:
@@ -166,7 +164,7 @@ def convert_dataset(dataset_path, record_path):
     # if(i<2): # For testing
     print("Start to convert scene: {}, Pls wait!".format(scene_token))
     nuscenes = NuScenes(n_helper, scene_token)
-    dataset_to_record(nuscenes, record_path,i)
+    dataset_to_record(nuscenes, record_path,i,mode)
     i+=1
     # else:
       #  break
@@ -309,7 +307,8 @@ class PointCloudBuilder_extra(Builder_extra):
             newObs.theta = math.radians(-X+180)
             x, y, z = sampleAnn["size"]
             newObs.length =y
-            newObs.width =z
+            # newObs.width =z
+            newObs.width = x
             newObs.height= z
             #newObs.velocity
                 
