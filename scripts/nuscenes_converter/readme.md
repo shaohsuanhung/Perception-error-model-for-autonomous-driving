@@ -1,10 +1,10 @@
 ## Introduction
-The scripts are published in the Apollo 8.0 ver, under the directory /apollo/modules/tools/dataset/nuscenes. Originally, the scripts can only convert the camera and LiDAR data, not including the annotations and the radar data. So the script: dataset_converter.py, main.py, nuscenes_lib.py are modified for this project use. Use the following command to convert the nuscenes dataset:
+The scripts are published in the Apollo 8.0 ver, under the directory /apollo/modules/tools/dataset/nuscenes. Originally, the scripts can only convert the camera and LiDAR data, not including the annotations and the radar data. So the script: `dataset_converter.py`, `main.py`, `nuscenes_lib.py` are modified for this project use. Use the following command to convert the nuscenes dataset:
 ## Convert dataset
 You can use below command to convert nuscenes dataset to apollo record file. There maybe multi sense in one dataset, and we create a record file for each scene.
 
 ```shell
-python3 main.py -i nuscenes_dataset_path
+python3 main.py -i {nuscenes_dataset_path} -o {output path} -m {gt or detection flag} 
 ```
 The name of the record file is the `scene_token.record`. If you do not specify a path, the file will be saved in the current path.
 
