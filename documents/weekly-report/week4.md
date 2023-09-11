@@ -1,5 +1,5 @@
 
-# Week 5 (Aug. 14 ~ Aug. 18) 
+# Week 4 (Aug. 14 ~ Aug. 18) 
 ## Weekly outcome
 - Successfully visualize the bounding box in the Dreamview, but need to calibrate the coordinate system.
 ![](../images/visualized_bounding_box.png)
