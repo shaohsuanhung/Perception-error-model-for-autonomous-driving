@@ -1,0 +1,53 @@
+sensor_meta {
+    name: "velodyne32"
+    type: VELODYNE_32
+    orientation: PANORAMIC
+}
+sensor_meta {
+    name: "radar_front"
+    type: LONG_RANGE_RADAR
+    orientation: FRONT
+}
+sensor_meta {
+    name: "radar_front_right"
+    type: LONG_RANGE_RADAR
+    orientation: RIGHT_FORWARD
+}
+sensor_meta {
+    name: "radar_front_left"
+    type: LONG_RANGE_RADAR
+    orientation: LEFT_FORWARD
+}
+sensor_meta {
+    name: "radar_rear_left"
+    type: LONG_RANGE_RADAR
+    orientation: LEFT_BACKWARD
+}
+sensor_meta {
+    name: "radar_rear_right"
+    type: LONG_RANGE_RADAR
+    orientation: RIGHT_BACKWARD
+}
+#sensor_meta {
+#    name: "front_6mm"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}
+
+#sensor_meta {
+#    name: "front_12mm"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}
+
+#sensor_meta {
+#    name: "onsemi_wide"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}
+
+#sensor_meta {
+#    name: "onsemi_traffic"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}

@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: novatel
+child_frame_id: radar_rear_left
+transform:
+  translation:
+    x: -0.562
+    y: 0.628
+    z: 0.53
+  rotation:
+    x: 0.0
+    y: 0.0
+    z: 0.9989466808500344
+    w: 0.0458860416542946
