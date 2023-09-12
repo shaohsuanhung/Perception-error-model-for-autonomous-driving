@@ -18,5 +18,6 @@ python3 main.py -i {nuscenes_dataset_path} -o {output path} -m {gt or detection 
 ## Next week task
 ### Urgent
 - Debug on the issue that the output of perception module is incorrect orientation.
+- My laptop is freeze for 5 minutes after launching the perception module, will ask Dr. Justin for the computation resource (more RAM on GPU).
 ### Normal
 - List tasks that you have scheduled to deal with.
