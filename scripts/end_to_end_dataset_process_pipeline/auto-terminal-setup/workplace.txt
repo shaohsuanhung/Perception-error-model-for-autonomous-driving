@@ -1,0 +1,57 @@
+# GNOME Terminal 3.3.68
+# gnome-terminal --load-config=workplace.txt
+[GNOME Terminal Configuration]
+Version=1
+CompatVersion=1
+FacttoryEnable=true
+
+Windows = Windows0;Window1;
+
+[Windows0]
+Menubvarvisble = true
+Maximized = false
+ActiveTerminal = Terminal1
+Geometry = 237x52+0+26
+Terminals = Terminal1;Terminal2;Terminal3;Terminal4;
+
+[Terminal1]
+Command='/bin/sh' '-c' 'docker/scripts/dev_into.sh''&& exec $SHELL -l'
+WorkingDirectory = /home/francis/Desktop/internship/apollo
+zoom=1
+width=237
+Height=52
+
+[Terminal2]
+Command='/bin/sh' '-c' ''docker/scripts/dev_into.sh'''&& exec $SHELL -l'
+WorkingDirectory = /home/francis/Desktop/internship/apollo
+zoom=1
+width=237
+Height=52
+
+[Terminal3]
+Command='/bin/sh' '-c' ''docker/scripts/dev_into.sh'''&& exec $SHELL -l'
+WorkingDirectory = /home/francis/Desktop/internship/apollo
+zoom=1
+width=237
+Height=52
+
+[Terminal4]
+Command='/bin/sh' '-c' ''docker/scripts/dev_into.sh'''&& exec $SHELL -l'
+WorkingDirectory = /home/francis/Desktop/internship/apollo
+zoom=1
+width=237
+Height=52
+
+[Window1]
+Menubvarvisble = true
+Maximized =false
+ActiveTerminal = Terminal5
+Geometry = 237x52+0+26
+Terminals = Terminal5;
+
+[Terminal5]
+Command='/bin/sh' '-c' ''docker/scripts/dev_into.sh'''&& exec $SHELL -l'
+WorkingDirectory = /home/francis/Desktop/internship/apollo
+zoom=1
+width=237
+Height=52
