@@ -52,7 +52,12 @@ LIDAR_TRANSFORM_before_rotate = np.array([[ 0.0020333, 0.9997041, 0.0242417, 0.9
                             [-0.9999805, 0.0021757,-0.0058486, 0.0000000],
                             [-0.0058997,-0.0242294, 0.9996890, 1.8402300],
                             [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
-# Since the original rotation mtx is still 90 deg. compare with the ground truth. Furhter rotate -90 deg. wrt z axis
+# LIDAR_TRANSFORM_before_rotate = np.array([[ 1.0000000, 0.0000000, 0.0000000, 0.0000000],
+#                                           [0.0000000, 1.0000000,0.0000000, 0.0000000],
+#                                           [0.0000000,0.0000000, 1.0000000, 0.0000000],
+#                                           [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
+
+# Rotate -90 deg. wrt z axis
 ROTATE = np.array([[ 0.0000000, 1.0000000, 0.0000000, 0.0000000],
                    [-1.0000000, 0.0000000,0.0000000, 0.0000000],
                    [0.0000000,0.0000000, 1.0000000, 0.0000000],
@@ -65,7 +70,6 @@ def dataset_to_record(nuscenes, record_root_path,idx,mode):
       nuscenes (_type_): nuscenes(one scene)
       record_root_path (str): record file saved path
   """
-  # print(LIDAR_TRANSFORM)
   image_builder = ImageBuilder()
   pc_builder = PointCloudBuilder(dim=5)
   pc_builder_extra = PointCloudBuilder_extra(dim=5)
@@ -82,7 +86,7 @@ def dataset_to_record(nuscenes, record_root_path,idx,mode):
   with Record(record_file_path, mode='w') as record:
     j = 0
     for c, f, ego_pose, calibrated_sensor, t in nuscenes:
-      logging.debug("{}, {}, {}, {}".format(c, f, ego_pose, t))
+      logging.debug("{}, {}, {}, {}".format(c, f, ego_pose, t/1e6))
       pb_msg = None
       ##################### Sensor msg #####################
       if c.startswith('CAM'):
@@ -139,12 +143,11 @@ def dataset_to_record(nuscenes, record_root_path,idx,mode):
       ############################################################################
       if mode == 'gt':
         if(ego_pose_t==sample['timestamp']):
-          gt_timestamp = sample['timestamp']
-          pb_msg = pc_builder_extra.build_nuscenes_gt(sample,'gt',gt_timestamp/1e6)
+          pb_msg = pc_builder_extra.build_nuscenes_gt(sample,'gt',j,ego_pose_t/1e6)
           try:
             sample = nusc.get('sample',sample['next'])
             if pb_msg:
-                record.write(GT,pb_msg,gt_timestamp*1000)
+                record.write(GT,pb_msg,ego_pose_t*1000)
           except:
               pass
       ############################################################################  
@@ -273,9 +276,9 @@ class PointCloudBuilder_extra(Builder_extra):
             pointList.append(newPoint)
     msg.contiobs.extend(pointList)
     return msg
-  def build_nuscenes_gt(self,sample,frame_id, sequ_num, t= None):
+  def build_nuscenes_gt(self,sample,frame_id, sequ_num, t):
     msg= PerceptionObstacles()
-    msg.header.timestamp_sec = sample['timestamp']
+    msg.header.timestamp_sec = t
     obstacleList = list()
     instanceDict = dict()
     IDcount = 0
@@ -313,7 +316,7 @@ class PointCloudBuilder_extra(Builder_extra):
             #newObs.velocity
                 
             newObs.type = category
-            newObs.timestamp =0 
+            newObs.timestamp = t
             #i=i+1
             obstacleList.append(newObs)
     msg.perception_obstacle.extend(obstacleList)
