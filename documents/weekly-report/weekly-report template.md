@@ -1,4 +1,3 @@
-
 # Week X (From ... to ...)
 **This is the template of weekly report**.  
 
