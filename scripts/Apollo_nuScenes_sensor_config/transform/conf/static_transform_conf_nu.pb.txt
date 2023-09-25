@@ -1,0 +1,48 @@
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "velodyne32"
+    file_path: "/apollo/modules/drivers/lidar/velodyne/params/nu_velodyne32_novatel_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "localization"
+    child_frame_id: "novatel"
+    file_path: "/apollo/modules/localization/msf/params/novatel_localization_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "radar_rear_left"
+    file_path: "/apollo/modules/perception/data/params/nu_rear_left_radar_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "radar_rear_right"
+    file_path: "/apollo/modules/perception/data/params/nu_rear_right_radar_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "radar_front"
+    file_path: "/apollo/modules/perception/data/params/nu_front_radar_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "radar_front_left"
+    file_path: "/apollo/modules/perception/data/params/nu_front_left_radar_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "radar_front_right"
+    file_path: "/apollo/modules/perception/data/params/nu_front_right_radar_extrinsics.yaml"
+    enable: true
+}

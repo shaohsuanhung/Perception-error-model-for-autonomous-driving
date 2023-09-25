@@ -1,0 +1,8 @@
+radar_name: "radar_front_left"
+tf_child_frame_id: "radar_front_left"
+radar_forward_distance: 250.0
+radar_preprocessor_method: "ContiArsPreprocessor"
+radar_perception_method: "RadarObstaclePerception"
+radar_pipeline_name: "FrontRadarPipeline"
+odometry_channel_name: "/apollo/localization/pose"
+output_channel_name: "/perception/inner/PrefusedObjects"
