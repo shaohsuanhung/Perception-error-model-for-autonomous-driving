@@ -1,4 +1,4 @@
-# Week 9 (From Sept. 19 to Sept. 23)
+# Week 9 (From Sept. 18 to Sept. 22)
 **Summary of the week**  
 1. Sept. 21th Progress meeting preparation.
 2. Implement dataset analyzer that count the number of samples perceived by different sensor for each scenes, and then sort out the raw data to (w(t),w'(t)) format, for the PEMs model training. 

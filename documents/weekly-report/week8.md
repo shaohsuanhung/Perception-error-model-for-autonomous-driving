@@ -1,4 +1,4 @@
-# Week 8 (From Aug. 11 to Aug. 15)
+# Week 8 (From Sept. 11 to Sept. 15)
 **Summary of the week**  
 1. Make the shell script to automatically run the dataset preparation pipline and workplace. Now only need to enter 4 commands (can be less) to convert all the txt file dataset. 
 2. Debug on the issue that the perceived dataset not totally record 19-second scenes. (For example, only record 10 second data.)
