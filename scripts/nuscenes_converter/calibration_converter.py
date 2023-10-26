@@ -23,7 +23,7 @@ import yaml
 from itertools import chain
 from pathlib import Path
 from nuscenes_lib import NuScenesSchema, NuScenesHelper, NuScenes
-
+import TransformTreeGenerator
 
 CALIBRATION_META_ROOT = '../calibration_meta'
 # Lidar meta
@@ -182,16 +182,41 @@ def gen_sensor_calibration(calibrations, calibration_file_path):
       calibrations (dict): nuscenes calibrated_sensor json objects
       calibration_file_path (str): saved path
   """
+  ####### For the nuScenes dataset, the Channel name is converted ##########
+  ###### LIDAR_TOP -> velodyne32
+  ###### RADAR_FRONT -> radar_front
+  ###### RADAR_FRONT_LEFT -> radar_front_left
+  ###### RADAR_FRONT_RIGHT -> radar_front_right
+  ###### RADAR_BACK_LEFT -> radar_back_left
+  ###### RADAR_BACK_RIGHT -> radar_back_right
   for channel, calibrated_sensor in calibrations.items():
     if channel.startswith('CAM'):
       gen_camera_params(channel, calibrated_sensor, calibration_file_path)
     elif channel.startswith('LIDAR'):
+      #############################
+      if channel == 'LIDAR_TOP':
+        channel = 'velodyne32'
+      #############################
       gen_velodyne_params(channel, calibrated_sensor, calibration_file_path)
     elif channel.startswith('RADAR'):
+      #############################
+      if channel == 'RADAR_FRONT':
+        channel = 'radar_front'
+      elif channel == 'RADAR_FRONT_LEFT':
+        channel = 'radar_front_left'
+      elif channel == 'RADAR_FRONT_RIGHT':
+        channel = 'radar_front_right'
+      elif channel == 'RADAR_BACK_LEFT':
+        channel = 'radar_rear_left'
+      elif channel == 'RADAR_BACK_RIGHT':
+        channel = 'radar_rear_right'
+      else:
+        print("Unsupported radar channel: {}".format(channel))
+      #############################
       gen_radar_params(channel, calibrated_sensor, calibration_file_path)
     else:
       print("Unsupported sensor: {}".format(channel))
-
+  
 
 def dataset_to_calibration(nuscenes, calibration_root_path):
   """Generate sensor calibration
@@ -216,11 +241,15 @@ def convert_calibration(dataset_path, calibration_root_path):
       dataset_path (str): nuscenes dataset path
       calibration_root_path (str): sensor calibrations saved path
   """
-  nuscenes_schema = NuScenesSchema(dataroot=dataset_path)
+  DATAVERSION = 'v1.0-trainval'
+  nuscenes_schema = NuScenesSchema(dataroot=dataset_path,version=DATAVERSION)
   n_helper = NuScenesHelper(nuscenes_schema)
 
   for scene_token in nuscenes_schema.scene.keys():
     print("Start to convert scene: {}, Pls wait!".format(scene_token))
     nuscenes = NuScenes(n_helper, scene_token)
     dataset_to_calibration(nuscenes, calibration_root_path)
+    # Abs path of transform module
+    config_path = '/home/francis/Desktop/internship/apollo/modules/transform/'
+    TransformTreeGenerator.TransformTreeGenerator(config_path, scene_token)
   print("Success! Calibrations saved in '{}'".format(calibration_root_path))
