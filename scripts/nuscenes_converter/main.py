@@ -11,6 +11,7 @@ import logging
 from calibration_converter import convert_calibration
 from dataset_converter import convert_dataset
 from pcd_converter import convert_pcd
+from radiate_dataset_converter import radiate_convert_dataset
 
 
 def main(args=sys.argv):
@@ -28,7 +29,6 @@ def main(args=sys.argv):
     "-t", "--type", action="store", type=str, required=False,
     default="rcd", choices=['rcd', 'cal', 'pcd'],
     help="Conversion type. rcd:record, cal:calibration, pcd:pointcloud")
-  # Customize for dataset preparation. To identify it's ground truth or detection
   parser.add_argument(
     "-m", "--mode", action="store", type=str, required=False,
     default="detection", choices=['gt', 'detection'],
@@ -42,6 +42,7 @@ def main(args=sys.argv):
       if args.output is None:
         args.output = '.'
       convert_dataset(args.input, args.output,args.mode)
+      # radiate_convert_dataset(args.input, args.output)
     else:
       logging.error("Pls enter directory! Not '{}'".format(args.input))
   elif args.type == 'cal':

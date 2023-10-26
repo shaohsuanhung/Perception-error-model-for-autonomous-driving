@@ -30,8 +30,10 @@ import math
 from nuscenes.nuscenes import NuScenes as Nuscenes_dataset
 from protoLib.imu_pb2 import Imu
 #
-DATAVERSION = 'v1.0-mini'
-DATAROOT = '/home/francis/Desktop/internship/nuScenes_dataset'
+# DATAVERSION = 'v1.0-mini'
+DATAVERSION = 'v1.0-trainval' # The name of the file under the DATAROOT
+# DATAROOT = '/home/francis/Desktop/internship/nuScenes_dataset/v1.0-trainval01'
+DATAROOT = '/home/francis/Desktop/internship/nuScenes_dataset/try/v1.0-trainval01_blobs/'
 LOCALIZATION_TOPIC = '/apollo/localization/pose'
 TF_TOPIC= '/tf'
 GT = '/apollo/perception/obstacles'
@@ -58,11 +60,13 @@ LIDAR_TRANSFORM_before_rotate = np.array([[ 0.0020333, 0.9997041, 0.0242417, 0.9
 #                                           [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
 
 # Rotate -90 deg. wrt z axis
-ROTATE = np.array([[ 0.0000000, 1.0000000, 0.0000000, 0.0000000],
-                   [-1.0000000, 0.0000000,0.0000000, 0.0000000],
-                   [0.0000000,0.0000000, 1.0000000, 0.0000000],
-                   [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
-LIDAR_TRANSFORM = np.matmul(LIDAR_TRANSFORM_before_rotate,ROTATE)
+# ROTATE = np.array([[ 0.0000000, 1.0000000, 0.0000000, 0.0000000],
+#                    [-1.0000000, 0.0000000,0.0000000, 0.0000000],
+#                    [0.0000000,0.0000000, 1.0000000, 0.0000000],
+#                    [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
+# LIDAR_TRANSFORM = np.matmul(LIDAR_TRANSFORM_before_rotate,ROTATE)
+LIDAR_TRANSFORM = LIDAR_TRANSFORM_before_rotate
+# LIDAR_TRANSFORM = LIDAR_TRANSFORM_before_rotate
 def dataset_to_record(nuscenes, record_root_path,idx,mode):
   """Construct record message and save it as record
 
@@ -72,13 +76,26 @@ def dataset_to_record(nuscenes, record_root_path,idx,mode):
   """
   image_builder = ImageBuilder()
   pc_builder = PointCloudBuilder(dim=5)
+  # Build this instance for each scene
   pc_builder_extra = PointCloudBuilder_extra(dim=5)
   localization_builder = LocalizationBuilder()
   transform_builder = TransformBuilder() 
+  # 3 condition: Sun, rain, night
+  scene = nusc.get('scene',nuscenes.scene_token)
+  if 'rain' in scene['description'].lower():
+      if 'night' in scene['description'].lower():
+        weather_tag = 'RainyNight'
+      else:
+        weather_tag = 'rain'
+  elif 'night' in scene['description'].lower():
+      weather_tag = 'night'
+  else:
+      weather_tag = 'sun'
+
   if mode == 'gt':
-    record_file_name = "{}_gt.record".format(nuscenes.scene_token)
+    record_file_name = "{}_gt_{}.record".format(nuscenes.scene_token,weather_tag)
   elif mode == 'detection':
-    record_file_name = "{}_detection.record".format(nuscenes.scene_token)
+    record_file_name = "{}_detection_{}.record".format(nuscenes.scene_token,weather_tag)
   record_file_path = os.path.join(record_root_path, record_file_name)
   # First sample token
   sample = nusc.get('sample',nusc.scene[idx]['first_sample_token'])
@@ -87,6 +104,7 @@ def dataset_to_record(nuscenes, record_root_path,idx,mode):
     j = 0
     for c, f, ego_pose, calibrated_sensor, t in nuscenes:
       logging.debug("{}, {}, {}, {}".format(c, f, ego_pose, t/1e6))
+      # print("{}, {}, {}, {}".format(c, f, ego_pose, t/1e6))
       pb_msg = None
       ##################### Sensor msg #####################
       if c.startswith('CAM'):
@@ -152,6 +170,9 @@ def dataset_to_record(nuscenes, record_root_path,idx,mode):
               pass
       ############################################################################  
       j+=1
+  # print("--------------- Instance Dict. -----------------")
+  # print(pc_builder_extra.instanceDict)
+  # print("-"*50)
 
 def convert_dataset(dataset_path, record_path,mode):
   """Generate apollo record file by nuscenes dataset
@@ -160,7 +181,7 @@ def convert_dataset(dataset_path, record_path,mode):
       dataset_path (str): nuscenes dataset path
       record_path (str): record file saved path
   """
-  nuscenes_schema = NuScenesSchema(dataroot=dataset_path)
+  nuscenes_schema = NuScenesSchema(dataroot=dataset_path,version=DATAVERSION)
   n_helper = NuScenesHelper(nuscenes_schema)
   i = 0
   for scene_token in nuscenes_schema.scene.keys():
@@ -197,6 +218,8 @@ class PointCloudBuilder_extra(Builder_extra):
   def __init__(self, dim=4) -> None:
     super().__init__()
     self._dim = dim
+    self.instanceDict = dict()
+    self.IDcount = 0
 
   def build(self, file_name, frame_id, t=None):
     pb_point_cloud = pointcloud_pb2.PointCloud()
@@ -276,12 +299,13 @@ class PointCloudBuilder_extra(Builder_extra):
             pointList.append(newPoint)
     msg.contiobs.extend(pointList)
     return msg
+  
   def build_nuscenes_gt(self,sample,frame_id, sequ_num, t):
     msg= PerceptionObstacles()
     msg.header.timestamp_sec = t
     obstacleList = list()
-    instanceDict = dict()
-    IDcount = 0
+    # instanceDict = dict()
+    # IDcount = 0
     #print("----------------------------------------------------------", j )
     # sample = nusc.get('sample_data',sam)
     for ann in sample['anns']:
@@ -296,11 +320,16 @@ class PointCloudBuilder_extra(Builder_extra):
         if category in [3,5]:
             newObs = PerceptionObstacle()
                 
-            if sampleAnn["instance_token"] not in instanceDict:
-                instanceDict[sampleAnn["instance_token"]] = IDcount
-                IDcount = IDcount+1
-            newObs.id = instanceDict[sampleAnn["instance_token"]]
-            #print(sampleAnn["instance_token"], self.instanceDict[sampleAnn["instance_token"]])
+            if sampleAnn["instance_token"] not in self.instanceDict:
+                self.instanceDict[sampleAnn["instance_token"]] = self.IDcount
+                self.IDcount = self.IDcount+1
+                # This means each instance has a unique ID, depends on the order that the instance appears
+                
+            newObs.id = self.instanceDict[sampleAnn["instance_token"]]
+            # print(sampleAnn["instance_token"], self.instanceDict[sampleAnn["instance_token"]])
+            # print("--------- Instance Dict. -----------------")
+            # print(self.instanceDict)
+            # print("-"*50)
             x, y, z = sampleAnn["translation"]
             # newObs.position.x,newObs.position.y, newObs.position.z = y,-x,z
             newObs.position.x,newObs.position.y, newObs.position.z = x, y,z
@@ -317,6 +346,8 @@ class PointCloudBuilder_extra(Builder_extra):
                 
             newObs.type = category
             newObs.timestamp = t
+            # visibility
+            # newObs.visibility = 1.0
             #i=i+1
             obstacleList.append(newObs)
     msg.perception_obstacle.extend(obstacleList)
