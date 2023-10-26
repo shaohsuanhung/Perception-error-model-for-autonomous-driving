@@ -11,8 +11,9 @@ elling for autonomous driving using autoregressive input-output hmms](https://ie
 Anticipating Maneuvers via Learning Temporal Driving Models](https://arxiv.org/pdf/1504.02789.pdf)
 
 - The first paper use the conditional autoregressive model to model the perception error in the surrounding zone, which is partition as the polar corrdinate.
-- The second paper use the AIO-HMMsto model the perception error, given the nature of the AIOHMM relax the conditional indepenece assuption between the outputs, which is suitable to model the highly autoregressive data for our case.
+- The second paper use the AIO-HMMs to model the perception error, given the nature of the AIOHMM relax the conditional indepenece assuption between the outputs, which is suitable to model the highly autoregressive data for our case.
 - The method used in the second paper is inspired from the thrid paper.
 - However, currently, there is not Python implementation of the AIO-HMMs. So have to implement the metdho by myself.
+- Summarize how I will modeling the perception error to Andrea, not hear from his reply for a weeks. 
 ## Next week task
 - Implement the AIO-HMM in Python.
