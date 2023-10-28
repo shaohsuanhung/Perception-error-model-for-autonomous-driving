@@ -12,7 +12,7 @@ The name of the record file is the `scene_token.record`. If you do not specify a
 You can use below command to convert nuscenes calibration to apollo calibration files. There maybe multi sense in one dataset, and we create calibration files for each scene.
 
 ```shell
-python3 main.py -i nuscenes_dataset_path -t=cal
+python3 main.py -i {nuscenes_dataset_path} -o {save files path} -t=cal
 ```
 
 #### Camera intrinsics
@@ -21,7 +21,11 @@ Camera intrinsics matrix. ref [link](http://docs.ros.org/en/melodic/api/sensor_m
 - K: Intrinsic camera matrix for the raw (distorted) images.
 - R: Rectification matrix (stereo cameras only)
 - P: Projection/camera matrix
-
+### For transform nuScenes dataset sensor calibration files
+When convert the calibration, the script [TransformTreeGenerator](./TransformTreeGenerator.py) will generate the corresponding dag files, pb.txt files, and launch under the `/apollo/modules/transform/` directory. Noted that the calibration should be to `/apollo/modules/transform/nuScenes_Calibration/` use the following command:
+```shell
+python3 main.py -i {nuscenes_dataset_path} -o {path to apollo}/modules/transform/nuScenes_Calibration -t=cal
+```
 ## Convert lidar pcd
 You can use below command to convert nuscenes lidar pcd to normal pcl file, which you can display in visualizer like `pcl_viewer`.
 
