@@ -4,6 +4,7 @@
 2. Since the nuscenes mini dataset only have 10 scenes (7 sun weather, 3 night, and no rain weather). Thus I download nuscenes trainval01 blobs to have more data on night and rain weather. 
 3. Identify 2 problems in the dataset after matching:(1) Missing detection for specific object.(2) Non-uniformed length of different GT object.
 4. Do the literature review on how to deal with these problem.
+5. Try out different architecture of PEMs, exploring different method. (Autoregressive input-output hidden Markov model, input-output hidden Markov model, or native hidden Markov model) 
 ## Weekly outcome
 1. Implement serialization and unserialization of the dataclass and object class. Since the matching process take severals minutes for one scene. Store the matching pairs to file would be a better method.
 
