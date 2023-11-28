@@ -148,14 +148,31 @@ class dataset_list(object):
         self.nbr_gt_samples =0
         # Read in the data
         self._make_localization(ego_content)
-        # self._make_detection(dt_content)
-        self._make_fusion_detection(dt_content)
+        ########## Select either line here if want to use fusion mode ##########
+        self._make_detection(dt_content)
+        # self._make_fusion_detection(dt_content)
+        ############################################################
         self._make_gt(gt_content,ego_content)
         # Interpolated the ego pose
         self._interpolated_ego_pose()
+        self._filter_modality('radar')
+        # self._filter_modality('velodyne32')
         self._rotate_detection()
         self._generate_object_map()
+        ###################################
+        ###################################
 
+    def _filter_modality(self,modality):
+        ''' Given the str of modality, get that modality from the sensor_data_list'''
+        # Filter out the modality
+        print("Before filtering:{}".format(len(self.sensor_data_list)))
+        self.sensor_data_list = [obj for obj in self.sensor_data_list if obj.sensor_id.startswith(modality)]
+        print("After filtering:{},sensor modal:{}".format(len(self.sensor_data_list),self.sensor_data_list[0].sensor_id))
+        # print("-------------- Number of sample after filter {} only---------------".format(modality))    
+        print("Scenes token:{}".format(self.scene_token))
+        print("Radar_front:{}\nRadar_front_left:{}\nRadar_front_right:{}\nRadar_rear_left:{}\nRadar_rear_right:{}".\
+          format(self.count_radar_front,self.count_radar_front_left,\
+          self.count_radar_front_right,self.count_radar_rear_left,self.count_radar_rear_right))
 
     def append_sensor_data(self,measurement):
         # Check the number of sample of data
@@ -178,8 +195,9 @@ class dataset_list(object):
             self.count_radar_rear_right+=1
 
         else:
-            print("Fusion mode")
-
+            # print("Fusion mode")
+            pass
+ 
     def _interpolated_ego_pose(self):
         # Some timestamp in the sensor is not in the ego pose, so interpolated the ego pose
         i = 0
@@ -429,8 +447,8 @@ class dataset_list(object):
             plt.arrow(egoPose.ego_position_x,egoPose.ego_position_y,5*math.cos(Angle),5*math.sin(Angle),width=0.1,color='blue')
             plt.legend()
             plt.title('Scene token:{}\nTime:{}'.format(self.scene_token,timestamp))
-            plt.xlim(330,440)
-            plt.ylim(1080,1220)
+            # plt.xlim(330,440)
+            # plt.ylim(1080,1220)
             plt.savefig('./render_frame/in_reader/'+str(i))
             i+=1
             # if i==38:
@@ -604,8 +622,8 @@ if __name__ == '__main__':
     # DTfile_list = glob.glob("/home/francis/Desktop/internship/apollo/HMM_dataset/text_dataset/detection/*_detection*.txt")
     # GTfile_list = glob.glob("/home/francis/Desktop/internship/apollo/HMM_dataset/text_dataset/ground_truth/*_gt*.txt")
     # Egofile_list = glob.glob("/home/francis/Desktop/internship/apollo/HMM_dataset/text_dataset/ground_truth/ego/*_gt*_ego-pose.txt")
-    token = 'cc8c0bf57f984915a77078b10eb33198'
-    weather = 'sun'
+    token = '0ced08ea43754420a23b2fbec667a763'
+    weather = 'rain'
     DTfile_list = glob.glob("/home/francis/Desktop/internship/apollo/HMM_dataset/text_dataset/detection/{}_detection_{}.txt".format(token,weather))
     GTfile_list = glob.glob("/home/francis/Desktop/internship/apollo/HMM_dataset/text_dataset/ground_truth/{}_gt_{}.txt".format(token,weather))
     Egofile_list = glob.glob("/home/francis/Desktop/internship/apollo/HMM_dataset/text_dataset/ground_truth/ego/{}_gt_{}_ego-pose.txt".format(token,weather))
@@ -619,7 +637,7 @@ if __name__ == '__main__':
         # cc8 ID 42: the vehcile in front of ego
         # ID: 72, 74, 78, 
         # dataset.render_DT()
-        dataset.render_object_map()
+        # dataset.render_object_map()
         print('Get the dataset of scene token:{}'.format(dataset.scene_token))
 
 # Planning:

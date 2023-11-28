@@ -40,6 +40,8 @@ class interpolated_gt_data:
     ego_position_y: float
     ego_position_z: float
     ego_theta     : float
+    #
+    visibility : int
 
 class AdvancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -204,6 +206,7 @@ class AlignedFrame(object):
                 new_obj_type = obj.type
                 interpolated_timestamp = obj.time_stamp * \
                     (1-ratio)+ratio*next_frame_obj[0].time_stamp
+                visibility   =  obj.tracking_time
                 ## Prevent the theta jump from 2pi to 0 or vice versa
                 if (obj.theta  < 2*math.pi and obj.theta>3*math.pi/2 and next_frame_obj[0].theta > 0 and next_frame_obj[0].theta < math.pi/2):
                     # next_frame_obj[0].theta += 2*math.pi
@@ -219,7 +222,7 @@ class AlignedFrame(object):
                 Angle = Quaternion(self.egoPose.orientation_qw,self.egoPose.orientation_qx,self.egoPose.orientation_qy,self.egoPose.orientation_qz).to_euler().yaw
                 interpolated_gt.append(interpolated_gt_data(int(obj.id),self.frameID,interpolated_position_x, interpolated_position_y, interpolated_position_z,
                                     interpolated_theta, interpolated_length, interpolated_width, interpolated_height, new_obj_type, self.detDataTimestamp,\
-                                    False,False,self.egoPose.ego_position_x,self.egoPose.ego_position_y,self.egoPose.ego_position_z,Angle))
+                                    False,False,self.egoPose.ego_position_x,self.egoPose.ego_position_y,self.egoPose.ego_position_z,Angle,int(visibility)))
             # If next_frame_obj is null, then interpolate_gt is null also, 
             # the trakcing object is missing
 
@@ -360,8 +363,8 @@ class AlignedFrame(object):
         plt.title("Timestamp:{},(Frame ID:{})".format(self.detDataTimestamp,self.frameID))
         # plt.legend('Interpolated GT','Ego Pose','GT in prev. frame','GT in next frame')
         plt.legend(prop = {'size': 6})
-        plt.xlim(330,440)
-        plt.ylim(1080,1220)
+        # plt.xlim(330,440)
+        # plt.ylim(1080,1220)
         plt.savefig('./render_frame/'+str(self.frameID))
         plt.close()
 
@@ -388,7 +391,8 @@ class PercObj():
 
     @staticmethod
     def matchingAngularDist(a,b,maxV):
-        MAX_ANG_ERROR = math.pi/4 # 90 degree
+        MAX_ANG_ERROR = math.pi/8 # 90 degree
+        # MAX_ANG_ERROR = math.pi*100 # to ignore the angular error
         angle_a = a.theta
         angle_b = b.theta
         angular_dist = abs(angle_a-angle_b)
@@ -704,27 +708,27 @@ if __name__ == '__main__':
     #     with open('AIOHMM_dataset_'+sceene.id+'_sun.json','w') as f:
     #         f.write(json.dumps(sceene.gtTrajDict,cls=AdvancedJSONEncoder,indent=2))
     #     f.close()
+    sensor = 'radar'
     if paired_scene_list_sun != []:
-        with open('AIOHMM_dataset_sun.json','w') as f:
+        with open('AIOHMM_dataset_{}_sun.json'.format(sensor),'w') as f:
             f.write(json.dumps(paired_scene_list_sun,cls=AdvancedJSONEncoder,indent=2))
         f.close()
     
     if  paired_scene_list_night != []:
-        with open('AIOHMM_dataset_night.json','w') as f:
+        with open('AIOHMM_dataset_{}_night.json'.format(sensor),'w') as f:
             f.write(json.dumps(paired_scene_list_night,cls=AdvancedJSONEncoder,indent=2))
         f.close()
     
     if paired_scene_list_rain != []:
-        with open('AIOHMM_dataset_rain.json','w') as f:
+        with open('AIOHMM_dataset_{}_rain.json'.format(sensor),'w') as f:
             f.write(json.dumps(paired_scene_list_rain,cls=AdvancedJSONEncoder,indent=2))
         f.close()
     
     if paired_scene_list_RainNight!=[]:
-        with open('AIOHMM_dataset_RainyNight.json','w') as f:
+        with open('AIOHMM_dataset_{}_RainyNight.json'.format(sensor),'w') as f:
             f.write(json.dumps(paired_scene_list_sun,cls=AdvancedJSONEncoder,indent=2))
         f.close()
-    
-    print('foo')
+
     # Example decode the json file to new TrajDict instance
     # with open('AIOHMM_dataset_sun.json','r') as f:
         # data_loaded =   json.load(f)
