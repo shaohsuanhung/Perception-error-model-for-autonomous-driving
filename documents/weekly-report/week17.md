@@ -1,4 +1,4 @@
-# Week 16 (From Nov. 13 to Nov. 17)
+# Week 17 (From Nov. 13 to Nov. 17)
 ## Weekly outcome
 1. Working on the workshop presentation and the report.
 2. Train the PEM with diffferent weather conditions:
