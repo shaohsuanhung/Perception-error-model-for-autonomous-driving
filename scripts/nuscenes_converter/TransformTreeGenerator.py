@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Generate the three files ({token}.pb.txt, {token}.dag, {token}.launch) for different scenes
-def GeneratePbFile(OutputPath,SceneToken):
+def GeneratePbFile(OutputPath, SceneToken):
     print(OutputPath)
-    f = open(OutputPath+'static_transform_conf_'+SceneToken+'.pb.txt','w')
+    f = open(OutputPath+'static_transform_conf_'+SceneToken+'.pb.txt', 'w')
     # content = 'extrinsic_file {\n\tframe_id: "novatel"\n\tchild_frame_id: "velodyne32"\n\t \
     # file_path: "/apollo/modules/transform/nuScenes_Calibration/{{}}/velodyne_params/velodyne32_novatel_extrinsics.yaml"\n\t\
     # enable: true\n}\nextrinsic_file {\n\tframe_id: "localization"\n\tchild_frame_id: "novatel"\n\tfile_path: "/apollo/modules/transform/nuScenes_Calibration/novatel_localization_extrinsics.yaml"\n\t\
@@ -20,11 +20,53 @@ def GeneratePbFile(OutputPath,SceneToken):
     content = f"""
 extrinsic_file {{
     frame_id: "novatel"
+    child_frame_id: "camera_front"
+    file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/caerma_params/CAM_FRONT_extrinsics.yaml"
+    enable: true
+}}
+
+extrinsic_file {{
+    frame_id: "novatel"
+    child_frame_id: "camera_front_left"
+    file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/caerma_params/CAM_FRONT_LEFT_extrinsics.yaml"
+    enable: true
+}}
+
+extrinsic_file {{
+    frame_id: "novatel"
+    child_frame_id: "camera_front_right"
+    file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/caerma_params/CAM_FRONT_right_extrinsics.yaml"
+    enable: true
+}}
+
+extrinsic_file {{
+    frame_id: "novatel"
+    child_frame_id: "camera_back"
+    file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/caerma_params/CAM_BACK_extrinsics.yaml"
+    enable: true
+}}
+
+extrinsic_file {{
+    frame_id: "novatel"
+    child_frame_id: "camera_back_left"
+    file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/caerma_params/CAM_BACK_LEFT_extrinsics.yaml"
+    enable: true
+}}
+
+extrinsic_file {{
+    frame_id: "novatel"
+    child_frame_id: "camera_back_right"
+    file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/caerma_params/CAM_BACK_RIGHT_extrinsics.yaml"
+    enable: true
+}}
+
+extrinsic_file {{
+    frame_id: "novatel"
     child_frame_id: "velodyne32"
     file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/velodyne_params/velodyne32_novatel_extrinsics.yaml"
     enable: true
 }}
-    
+
 extrinsic_file {{
     frame_id: "localization"
     child_frame_id: "novatel"
@@ -41,7 +83,7 @@ extrinsic_file {{
 extrinsic_file {{
     frame_id: "novatel"
     child_frame_id: "radar_rear_right"
-    file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/radar_params/radar_rear_right_extrinsics.yaml"        
+    file_path: "/apollo/modules/transform/nuScenes_Calibration/{SceneToken}/radar_params/radar_rear_right_extrinsics.yaml"
     enable: true
 }}
 
@@ -69,10 +111,10 @@ extrinsic_file {{
     f.close()
 
     return
-    
 
-def GenerateDagFile(OutputPath,SceneToken):
-    f = open(OutputPath+'static_transform_'+SceneToken+'.dag','w')
+
+def GenerateDagFile(OutputPath, SceneToken):
+    f = open(OutputPath+'static_transform_'+SceneToken+'.dag', 'w')
     # content = '# Define all coms in DAG streaming.\n\
     #            module_config {\n\t\
     #            module_library : "/apollo/bazel-bin/modules/transform/libstatic_transform_component.so"\n\t\
@@ -99,8 +141,9 @@ module_config {{
     f.close()
     return
 
-def GenerateLaunchFile(OutputPath,SceneToken):
-    f = open(OutputPath+'static_transform_'+SceneToken+'.launch','w')
+
+def GenerateLaunchFile(OutputPath, SceneToken):
+    f = open(OutputPath+'static_transform_'+SceneToken+'.launch', 'w')
     # content = '<cyber>\n\t\
     #            <module>\n\t\t\
     #            <name>static_transform</name>\n\t\t\
@@ -121,9 +164,10 @@ def GenerateLaunchFile(OutputPath,SceneToken):
     f.close()
     return
 
-def TransformTreeGenerator(OutputPath,SceneToken):
+
+def TransformTreeGenerator(OutputPath, SceneToken):
     # Given the path of transform module, usually it is modules/transfrom
-    GeneratePbFile(OutputPath+'conf/',SceneToken)
-    GenerateDagFile(OutputPath+'dag/',SceneToken)
-    GenerateLaunchFile(OutputPath+'launch/',SceneToken)
+    GeneratePbFile(OutputPath+'conf/', SceneToken)
+    GenerateDagFile(OutputPath+'dag/', SceneToken)
+    GenerateLaunchFile(OutputPath+'launch/', SceneToken)
     return

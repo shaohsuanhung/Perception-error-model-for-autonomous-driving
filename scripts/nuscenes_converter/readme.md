@@ -4,7 +4,7 @@ The scripts are published in the Apollo 8.0 ver, under the directory [/apollo/mo
 You can use below command to convert nuscenes dataset to apollo record file. There maybe multi sense in one dataset, and we create a record file for each scene.
 
 ```shell
-python3 main.py -i {nuscenes_dataset_path} -o {output path} -m {gt or detection flag} 
+python3 main.py -i {nuscenes_dataset_path} -o {output path} -m {gt or detection flag}
 ```
 The name of the record file is the `scene_token.record`. If you do not specify a path, the file will be saved in the current path. There are only two for the augment `-m` . `-m  gt` records (1) the sensory data of LiDAR, radars, and cameras, (2) annotations in the channels `/apollo/perception/obstacles`, you would see the 3D bounding boxes ground truth in the Dreaview UI. While `-m detection` means records only (1) the sensory data of LiDAR, radars, and cameras data.
 
@@ -22,7 +22,7 @@ Camera intrinsics matrix. ref [link](http://docs.ros.org/en/melodic/api/sensor_m
 - R: Rectification matrix (stereo cameras only)
 - P: Projection/camera matrix
 ### For transform nuScenes dataset sensor calibration files
-When convert the calibration, the script [TransformTreeGenerator](./TransformTreeGenerator.py) will generate the corresponding dag files, pb.txt files, and launch under the `/apollo/modules/transform/` directory. Noted that the calibration should be to `/apollo/modules/transform/nuScenes_Calibration/` use the following command:
+When convert the calibration, the script [TransformTreeGenerator](./TransformTreeGenerator.py) will generate the corresponding dag files, pb.txt files, and launch under the `/apollo/modules/transform/` directory. Noted that the calibration should be to `/apollo/modules/transform/nuScenes_Calibration/` use the following command: (Please run that file under the your apollo directory)
 ```shell
 python3 main.py -i {nuscenes_dataset_path} -o {path to apollo}/modules/transform/nuScenes_Calibration -t=cal
 ```
