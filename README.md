@@ -4,7 +4,7 @@ The full-time research internship. The main goal of the project is investiage th
 ## Project Description
 ### Problem statement
 our objective is to investigate how weather conditions alter the error distributions that the PEM predicted. To tackle the problem, we train several weather-specific PEMs:
-$$\hat{\mathcal{W}}_{C\times M} \approx \text{PEM}_{C\times M}(\mathcal{W}_{C\times M})\text{,}\nonumber$$
+$\hat{\mathcal{W}}_{C\times M} \approx \text{PEM}_{C\times M}(\mathcal{W}_{C\times M})\text{,}$
 where $C$ is the set of weather conditions and $M$ is the set of sensor setups. In our work, $C = \{\text{sun}, \text{rain}, \text{night}\}$, and $M = \{\text{fusion of LiDAR and radar},\text{LiDAR only},\text{radar only}\}$.  
 Then, investigating the statistical information of the error distributions that PEMs output. Specifically, we compare the means and standard deviation under different weather conditions i.e., $(\mu_{i},\sigma_{i})$, where $i \in C\times M$.
 
