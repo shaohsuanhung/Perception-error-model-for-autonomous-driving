@@ -38,3 +38,7 @@ Design and implement the HMM-based PEM. Train the PEM and investiage the errors 
 
 ### Progress 
 Please refer to the following directory: [documents/weekly-report](https://github.com/HungFrancis/self-driving-internship-project/tree/main/documents/weekly-report).
+
+
+### Final report
+Pleasee refer to the [document](https://github.com/HungFrancis/self-driving-internship-project/tree/main/final_report.pdf) for details.
